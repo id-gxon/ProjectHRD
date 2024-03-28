@@ -27,7 +27,6 @@
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-
 </head>
 <!-- jQuery 2.1.4 -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -48,54 +47,56 @@
 						<!-- Messages: style can be found in dropdown.less-->
 
 						<!-- Notifications: style can be found in dropdown.less -->
-						<li class="dropdown notifications-menu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-bell-o"></i> <span class="label label-warning">10</span>
+						<li class="dropdown notifications-menu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-bell-o"></i> <span class="label label-warning">${notificationCount}</span>
 						</a>
 							<ul class="dropdown-menu">
-								<li class="header">You have 10 notifications</li>
+								<li class="header"><span>알림이 ${notificationCount}개 있습니다.</span>
+									<div class="notification-buttons">
+										<form action="<%=request.getContextPath()%>/noti/notifications" method="GET">
+											<button type="submit">알림목록</button>
+										</form>
+										<form action="<%=request.getContextPath()%>/noti/deleteAllNoti" method="post">
+											<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+											<button type="submit">모두삭제</button>
+										</form>
+									</div></li>
 								<li>
 									<!-- inner menu: contains the actual data -->
 									<ul class="menu">
-										<li><a href="#"> <i class="fa fa-users text-aqua"></i> 5 new members joined today
-										</a></li>
-										<li><a href="#"> <i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the page and may cause design problems
-										</a></li>
-										<li><a href="#"> <i class="fa fa-users text-red"></i> 5 new members joined
-										</a></li>
 
-										<li><a href="#"> <i class="fa fa-shopping-cart text-green"></i> 25 sales made
-										</a></li>
-										<li><a href="#"> <i class="fa fa-user text-red"></i> You changed your username
-										</a></li>
+										<!-- 알림 목록 출력 -->
+										<c:forEach var="notification" items="${notiListSelect}">
+											<li>
+												<div>
+													<span>${notification.employee_id}</span> <span><a href="${notification.noti_link}">${notification.noti_title}</a></span> <span>${notification.noti_check == 0 ? '읽지 않음' : '읽음'}</span>
+													<!-- 알림 확인을 위한 폼 -->
+													<form action="${pageContext.request.contextPath}/noti/readNoti" method="post" style="display: inline;">
+														<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"> <input type="hidden" name="employee_id" value="${notification.employee_id}"> <input type="hidden" name="noti_title" value="${notification.noti_title}"> <input type="hidden" name="noti_time" value="${notification.noti_time}">
+														<button type="submit">확인</button>
+													</form>
+												</div>
+											</li>
+										</c:forEach>
 									</ul>
 								</li>
-								<li class="footer"><a href="#">View all</a></li>
+
 							</ul></li>
 
 						<!-- User Account: style can be found in dropdown.less -->
-						<li class="dropdown user user-menu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <img src="/resources/dist/img/user2-160x160.jpg" class="user-image" alt="User Image" /> <span class="hidden-xs">${sessionScope.evo.emp_name } </span>
+						<li class="dropdown user user-menu"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <img src="/emp/download?PROFIL=${sessionScope.evo.PROFIL }" class="user-image" alt="User Image" /> <span class="hidden-xs">${sessionScope.evo.emp_name } </span>
 						</a>
 							<ul class="dropdown-menu">
 								<!-- User image -->
-								<li class="user-header"><img src="/resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+								<li class="user-header"><img src="/emp/download?PROFIL=${sessionScope.evo.PROFIL }" class="img-circle" alt="User Image" />
 									<p>
 										${sessionScope.evo.emp_name } <small>Member since ${sessionScope.evo.start_date }</small>
 									</p></li>
 								<!-- Menu Body -->
-								<li class="user-body">
-									<div class="col-xs-4 text-center">
-										<a href="#">Followers</a>
-									</div>
-									<div class="col-xs-4 text-center">
-										<a href="#">Sales</a>
-									</div>
-									<div class="col-xs-4 text-center">
-										<a href="#">Friends</a>
-									</div>
-								</li>
+
 								<!-- Menu Footer-->
 								<li class="user-footer">
 									<div class="pull-left">
-										<a href="#" class="btn btn-default btn-flat">내 정보</a>
+										<a href="/common/changePw" class="btn btn-default btn-flat">비밀번호 변경</a>
 									</div>
 									<div class="pull-right">
 										<form action="/customLogout" method="post" onsubmit="showAlert()">
@@ -118,19 +119,37 @@
 				<!-- Sidebar user panel -->
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="/resources/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image" />
+						<img src="/emp/download?PROFIL=${sessionScope.evo.PROFIL }" class="img-circle" alt="User Image" />
 					</div>
 					<div class="pull-left info">
 						<p>${sessionScope.evo.emp_name }</p>
-
+					<c:if test="${not empty sessionScope.evo}">
 						<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+					</c:if>
+					<c:if test="${empty sessionScope.evo}">
+						<a href="#"><i class="fa fa-circle text-danger"></i> Offline</a>
+					</c:if>
 					</div>
 				</div>
 
 				<!-- sidebar menu: : style can be found in sidebar.less -->
 				<ul class="sidebar-menu">
 					<li class="header">Menu</li>
-					<li class="treeview"><a href="#"> <i class="fa-solid fa-user"> </i> <span>인사 관리</span> <i class="fa fa-angle-left pull-right"></i>
+					<li class="treeview"><a href="#"> <i class="fa-solid fa-user"> </i> &nbsp <span>인사 관리</span> <i class="fa fa-angle-left pull-right"></i>
+					</a>
+						<ul class="treeview-menu">
+							<li><a href="/emp/viewEmp"><i class="fa fa-circle-o"></i> 인사정보조회 </a></li>
+							<sec:authorize access="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">
+								<li><a href="/emp/registEmp"><i class="fa fa-circle-o"></i> 인사정보등록 </a></li>
+								<li><a href="/emp/listEmp?searchType=employee_id&keyword="><i class="fa fa-circle-o"></i> 인사목록조회 </a></li>
+							</sec:authorize>
+							<li><a href="/emp/applyEvent"><i class="fa fa-circle-o"></i> 경조비신청 </a></li>
+							<li><a href="/emp/viewEvent?searchType=eve_class&keyword="><i class="fa fa-circle-o"></i> 경조비신청내역 </a></li>
+							<sec:authorize access="hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')">
+								<li><a href="/emp/listEvent?searchType=employee_id&keyword="><i class="fa fa-circle-o"></i> 경조비신청관리 </a></li>
+							</sec:authorize>
+						</ul></li>
+					<li class="treeview"><a href="#"> <i class="fa-solid fa-building"></i> &nbsp <span>근태 관리</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 						<ul class="treeview-menu">
 							<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
@@ -140,7 +159,7 @@
 							<li><a href="../UI/timeline.html"><i class="fa fa-circle-o"></i> 메뉴5 </a></li>
 							<li><a href="../UI/modals.html"><i class="fa fa-circle-o"></i> 메뉴6 </a></li>
 						</ul></li>
-					<li class="treeview"><a href="#"> <i class="fa-solid fa-building"></i> <span>근태 관리</span> <i class="fa fa-angle-left pull-right"></i>
+					<li class="treeview"><a href="#"> <i class="fa-solid fa-won-sign"></i> &nbsp <span>급여 관리</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 						<ul class="treeview-menu">
 							<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
@@ -150,32 +169,22 @@
 							<li><a href="../UI/timeline.html"><i class="fa fa-circle-o"></i> 메뉴5 </a></li>
 							<li><a href="../UI/modals.html"><i class="fa fa-circle-o"></i> 메뉴6 </a></li>
 						</ul></li>
-					<li class="treeview"><a href="#"> <i class="fa-solid fa-won-sign"></i> <span>급여 관리</span> <i class="fa fa-angle-left pull-right"></i>
+					<li class="treeview"><a href="#"> <i class="fa-solid fa-people-roof"></i> &nbsp <span>조직도</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 						<ul class="treeview-menu">
-							<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
-							<li><a href="../UI/icons.html"><i class="fa fa-circle-o"></i> 메뉴2 </a></li>
-							<li><a href="../UI/buttons.html"><i class="fa fa-circle-o"></i> 메뉴3 </a></li>
-							<li><a href="../UI/sliders.html"><i class="fa fa-circle-o"></i> 메뉴4 </a></li>
-							<li><a href="../UI/timeline.html"><i class="fa fa-circle-o"></i> 메뉴5 </a></li>
-							<li><a href="../UI/modals.html"><i class="fa fa-circle-o"></i> 메뉴6 </a></li>
+							<li><a href="../org/orgList"><i class="fa fa-circle-o"></i> 전체 조직도 </a></li>
+							<li><a href="../org/orgDept"><i class="fa fa-circle-o"></i> 전체 부서 </a></li>
+							<li><a href="../org/getEmployeesByDept"><i class="fa fa-circle-o"></i> 부서 별 조직도 </a></li>
+							<li><a href="../org/orgFavor"><i class="fa fa-circle-o"></i> 즐겨찾기 </a></li>
 						</ul></li>
-					<li class="treeview"><a href="#"> <i class="fa-solid fa-people-roof"></i> <span>조직도</span> <i class="fa fa-angle-left pull-right"></i>
-					</a>
-						<ul class="treeview-menu">
-							<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
-							<li><a href="../UI/icons.html"><i class="fa fa-circle-o"></i> 메뉴2 </a></li>
-							<li><a href="../UI/buttons.html"><i class="fa fa-circle-o"></i> 메뉴3 </a></li>
-							<li><a href="../UI/sliders.html"><i class="fa fa-circle-o"></i> 메뉴4 </a></li>
-							<li><a href="../UI/timeline.html"><i class="fa fa-circle-o"></i> 메뉴5 </a></li>
-							<li><a href="../UI/modals.html"><i class="fa fa-circle-o"></i> 메뉴6 </a></li>
-						</ul></li>
-					<li class="treeview"><a href="/board/list"> <i class="fa-regular fa-clipboard"></i> <span>공지사항</span> <i class="fa fa-angle-left pull-right"></i>
+					<li class="treeview"><a href="/board/list"> <i class="fa-regular fa-clipboard"></i> &nbsp &nbsp <span> 공지사항</span>
 					</a></li>
 					<li class="treeview"><a href="#"> <i class="fa fa-laptop"></i> <span>UI Elements</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 						<ul class="treeview-menu">
-							<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
+							<sec:authorize access="hasRole('ROLE_ADMIN')">
+								<li><a href="../UI/general.html"><i class="fa fa-circle-o"></i> 메뉴1 </a></li>
+							</sec:authorize>
 							<li><a href="../UI/icons.html"><i class="fa fa-circle-o"></i> 메뉴2 </a></li>
 							<li><a href="../UI/buttons.html"><i class="fa fa-circle-o"></i> 메뉴3 </a></li>
 							<li><a href="../UI/sliders.html"><i class="fa fa-circle-o"></i> 메뉴4 </a></li>
@@ -195,8 +204,8 @@
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
 				<ol class="breadcrumb">
-					<li></li>
-					<li></li>
-					<li></li>
+					<!-- 					<li></li> -->
+					<!-- 					<li></li> -->
+					<!-- 					<li></li> -->
 				</ol>
 			</section>

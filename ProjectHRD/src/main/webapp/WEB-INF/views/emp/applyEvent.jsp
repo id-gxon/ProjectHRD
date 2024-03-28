@@ -11,6 +11,7 @@
 		<div class="box-body">
 			<form action="" method="post">
 				<input type="hidden" id="employee_id" name="employee_id" value="${employee_id }">
+				<input type="hidden" name="${_csrf.parameterName }" value="${_csrf.token }">
 				<div class="form-group">
 					<label>경조구분</label>
 					<select class="form-control select2 select2-hidden-accessible" id="eve_class" name="eve_class" style="width: 520px;" tabindex="-1" aria-hidden="true">
@@ -21,18 +22,18 @@
 					</select>
 				</div>
 				<div class="form-group">
-					<label>대상자명</label> <input type="text" class="form-control" id="eve_subject" name="eve_subject" style="width: 520px;" placeholder="대상자명">
+					<label>대상자명</label> <input type="text" class="form-control" id="eve_subject" name="eve_subject" style="width: 520px;" placeholder="대상자명" required>
 				</div>
 				<div class="form-group">
 					<label>경조일자</label>
 					<div class="input-group date">
-						<input type="date" class="form-control pull-right" id="eve_date" name="eve_date" style="width: 520px;" max="9999-12-31">
+						<input type="date" class="form-control pull-right" id="eve_date" name="eve_date" style="width: 520px;" max="9999-12-31" required>
 					</div>
 				</div>
 				<div class="form-group">
 					<label>신청금액</label>
 					<div class="input-group">
-						<span class="input-group-addon"><i class="fa fa-dollar"></i></span> <input type="text" class="form-control" style="width: 485px;" id="eve_amount" name="eve_amount">
+						<span class="input-group-addon"><i class="fa fa-dollar"></i></span> <input type="text" class="form-control" style="width: 485px;" id="eve_amount" pattern="[0-9]*" value="0" name="eve_amount">
 					</div>
 				</div>
 
